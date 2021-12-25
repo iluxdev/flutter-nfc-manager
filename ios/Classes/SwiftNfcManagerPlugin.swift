@@ -740,6 +740,7 @@ extension SwiftNfcManagerPlugin: NFCTagReaderSessionDelegate {
       if let error = error {
         // skip tag detection
         print(error)
+        channel.invokeMethod("onError", arguments: getErrorMap(error))
         return
       }
 
@@ -747,6 +748,7 @@ extension SwiftNfcManagerPlugin: NFCTagReaderSessionDelegate {
         if let error = error {
           // skip tag detection
           print(error)
+          channel.invokeMethod("onError", arguments: getErrorMap(error))
           return
         }
 
