@@ -736,32 +736,25 @@ extension SwiftNfcManagerPlugin: NFCTagReaderSessionDelegate {
   public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
     let handle = NSUUID().uuidString
 
-    do {
-      try session.connect(to: tags.first!) { error in
+    session.connect(to: tags.first!) { error in
       if let error = error {
         // skip tag detection
-        channel.invokeMethod("onError", arguments: getErrorMap(error))
-        print("session.connect error")
         print(error)
+        self.channel.invokeMethod("onError", arguments: getErrorMap(error))
         return
       }
 
       getNFCTagMapAsync(tags.first!) { tag, data, error in
         if let error = error {
           // skip tag detection
-          channel.invokeMethod("onError", arguments: getErrorMap(error))
-          print("getNFCTagMapAsync error")
           print(error)
+          self.channel.invokeMethod("onError", arguments: getErrorMap(error))
           return
         }
 
         self.tags[handle] = tag
         self.channel.invokeMethod("onDiscovered", arguments: data.merging(["handle": handle]) { cur, _ in cur })
       }
-    }
-    } catch {
-      print("OMG! ERROR \(error).")
-      channel.invokeMethod("onError", arguments: getErrorMap(error))
     }
   }
 }
